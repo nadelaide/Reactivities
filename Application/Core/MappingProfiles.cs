@@ -8,6 +8,7 @@ namespace Application.Core
         public MappingProfiles()
         {
             CreateMap<Activity, Activity>();//map from, map to 
+            CreateMap<Concert, Concert>();//map from, map to 
         }
     }
 }
