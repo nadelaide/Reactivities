@@ -54,4 +54,8 @@ export default class UserStore {
             throw error; //throwing to register
         }
     }
+
+    setImage = (image: string) => {
+        if (this.user) this.user.image = image;
+    }
 }
