@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
+import { profile } from 'node:console';
 import { toast } from 'react-toastify';
 // import { TypeFormatFlags } from 'typescript';
 import { history } from '../..';
@@ -67,6 +68,7 @@ const requests = {
     post: <T> (url: string, body: {}) => axios.post<T>(url, body).then(responseBody),
     put: <T> (url: string, body: {}) => axios.put<T>(url, body).then(responseBody),
     del: <T>  (url: string) => axios.delete<T>(url).then(responseBody)
+
 }
 
 const Activities = {
@@ -94,7 +96,8 @@ const Profiles = {
         })
     },
     setMainPhoto: (id: string) => requests.post(`/photos/${id}/setMain`, {}),
-    deletePhoto: (id: string) => requests.del(`/photos/${id}`)
+    deletePhoto: (id: string) => requests.del(`/photos/${id}`),
+    updateProfile: (profile: Partial<Profile>) => requests.put(`/profiles/`, profile)
 }
 
 const agent = {

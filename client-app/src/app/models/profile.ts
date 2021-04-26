@@ -2,10 +2,10 @@ import { string } from "yup/lib/locale"
 import { User } from "./user";
 
 export interface Profile {
-    username: string;
-    displayName: string;
+    username?: string;
+    displayName?: string;
     image?: string;
-    bio: string;
+    bio?: string;
     photos?: Photo[];
 }
 

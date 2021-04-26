@@ -30,7 +30,11 @@ namespace API.Extensions
             {
                 opt.AddPolicy("CorsPolicy", policy => 
                 {
-                    policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:3000"); //required when accessing a resource from a different domain (client is 3000, api is 5000)
+                    policy
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials()
+                    .WithOrigins("http://localhost:3000"); //required when accessing a resource from a different domain (client is 3000, api is 5000)
                 });
             });
             services.AddMediatR(typeof(List.Handler).Assembly); //tells MediatR where to go and find our handlers
@@ -38,6 +42,7 @@ namespace API.Extensions
             services.AddScoped<IUserAccessor, UserAccessor>();
             services.AddScoped<IPhotoAccessor, PhotoAccessor>();
             services.Configure<CloudinarySettings>(config.GetSection("Cloudinary")); //parameter is section found in appsettings.json (secure)
+            services.AddSignalR();
 
             return services;
             }
