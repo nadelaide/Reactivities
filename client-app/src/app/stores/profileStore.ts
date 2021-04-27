@@ -114,7 +114,7 @@ export default class ProfileStore {
         }
     }
 
-    updateProfile = async (profile: Profile) => {
+    updateProfile = async (profile: Partial<Profile>) => {
         this.loading = true;
         try {
             await agent.Profiles.updateProfile(profile);
@@ -138,15 +138,15 @@ export default class ProfileStore {
             await agent.Profiles.updateFollowing(username);
             store.activityStore.updateAttendeeFollowing(username);
             runInAction(() => {
-                if (this.profile && this.profile.username !== store.userStore.user?.username && this.profile.username !== username) {
+                if (this.profile && this.profile.followersCount && this.profile.username !== store.userStore.user?.username && this.profile.username !== username) {
                     following ? this.profile.followersCount++ : this.profile.followersCount--;
                     this.profile.following = !this.profile.following;
                 }
-                if (this.profile && this.profile.username === store.userStore.user?.username) {
+                if (this.profile && this.profile.followingCount && this.profile.username === store.userStore.user?.username) {
                     following ? this.profile.followingCount++ : this.profile.followingCount--;
                 }
                 this.followings.forEach(profile => {
-                    if (profile.username === username) {
+                    if (profile.username === username && profile.followersCount) {
                         profile.following ? profile.followersCount-- : profile.followersCount++;
                         profile.following = !profile.following;
                     }
@@ -162,11 +162,13 @@ export default class ProfileStore {
     loadFollowings = async (predicate: string) => {
         this.loadingFollowings = true;
         try {
-            const followings = await agent.Profiles.listFollowings(this.profile!.username, predicate);
+            if (this.profile!.username) {
+                const followings = await agent.Profiles.listFollowings(this.profile!.username, predicate);
             runInAction(() => {
                 this.followings = followings;
                 this.loadingFollowings = false;
             })
+        }
         } catch (error) {
             runInAction(() => this.loadingFollowings = false);
         }
