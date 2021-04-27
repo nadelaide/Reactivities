@@ -7,7 +7,7 @@ import { useStore } from '../../../app/stores/store';
 import ActivityDetailedChat from './ActivityDetailedChat';
 import ActivityDetailedHeader from './ActivityDetailedHeader';
 import ActivityDetailedInfo from './ActivityDetailedInfo';
-import ActivityDetailedSidebar from './ActivityDetailedSidbar';
+import ActivityDetailedSidebar from './ActivityDetailedSidebar';
 
 export default observer (function ActivityDetails() {
 

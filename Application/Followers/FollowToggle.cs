@@ -1,0 +1,68 @@
+using System.Threading;
+using System.Threading.Tasks;
+using Application.Core;
+using Application.Interfaces;
+using Domain;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Persistence;
+
+namespace Application.Followers
+{
+    public class FollowToggle
+    {
+        public class Command : IRequest<Result<Unit>>
+        {
+            public string TargetUsername { get; set; } //target user you're attempting to follow
+        }
+
+        public class Handler : IRequestHandler<Command, Result<Unit>>
+        {
+            private readonly DataContext _context;
+            private readonly IUserAccessor _userAccessor;
+            public Handler(DataContext context, IUserAccessor userAccessor) //need access to database, and user attempting to follow other user
+            {
+                _userAccessor = userAccessor;
+                _context = context;
+            }
+
+            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
+            {
+                //get our two users
+                var observer = await _context.Users.FirstOrDefaultAsync(x => 
+                    x.UserName == _userAccessor.GetUsername());
+
+                var target = await _context.Users.FirstOrDefaultAsync(x =>
+                    x.UserName == request.TargetUsername);
+
+                if (target == null) return null;
+
+                //attempt to get a following from the database
+                // pass primary key through FindAsync (observer.ID, target ID)
+                var following = await _context.UserFollowings.FindAsync(observer.Id, target.Id);
+
+                //check if following is null (create new following) or remove following
+                if (following == null)
+                {
+                    following = new UserFollowing
+                    {
+                        Observer = observer,
+                        Target = target
+                    };
+
+                    _context.UserFollowings.Add(following);
+                } 
+                else
+                {
+                    _context.UserFollowings.Remove(following);
+                }
+
+                var success = await _context.SaveChangesAsync() > 0;
+
+                if (success) return Result<Unit>.Success(Unit.Value);
+
+                return Result<Unit>.Failure("Failed to update following");
+            }
+        }
+    }
+}
