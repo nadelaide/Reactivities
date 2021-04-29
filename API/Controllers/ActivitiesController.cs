@@ -1,38 +1,33 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Domain;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Persistence;
-
 using Application.Activities;
-using System.Threading;
+using Application.Core;
+using Domain;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-
     public class ActivitiesController : BaseApiController
     {
-
         [HttpGet]
-        public async Task<IActionResult> GetActivities()
+        public async Task<IActionResult> GetActivities([FromQuery]ActivityParams param)
         {
-            return HandleResult(await Mediator.Send(new List.Query()));
+            return HandlePagedResult(await Mediator.Send(new List.Query{Params = param}));
         }
 
-        [HttpGet("{id}")] // activities/id 
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetActivity(Guid id)
         {
-            return HandleResult(await Mediator.Send(new Details.Query{Id = id})); // shows results of query
+            return HandleResult(await Mediator.Send(new Details.Query{Id = id}));
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateActivity(Activity activity) //recognizes it needs to look inside the body of the request to find this object
+        public async Task<IActionResult> CreateActivity(Activity activity)
         {
             return HandleResult(await Mediator.Send(new Create.Command {Activity = activity}));
         }
+
         [Authorize(Policy = "IsActivityHost")]
         [HttpPut("{id}")]
         public async Task<IActionResult> EditActivity(Guid id, Activity activity)
@@ -53,5 +48,5 @@ namespace API.Controllers
         {
             return HandleResult(await Mediator.Send(new UpdateAttendance.Command{Id = id}));
         }
-    } 
+    }
 }

@@ -1,7 +1,7 @@
 import { useField } from 'formik';
 import React from 'react';
 import { Form, Label } from 'semantic-ui-react';
-import { isPropertySignature } from 'typescript';
+
 
 interface Props { 
     placeholder: string;
